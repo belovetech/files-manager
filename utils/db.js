@@ -3,16 +3,16 @@ const { MongoClient } = require('mongodb');
 const HOST = process.env.DB_HOST || 'localhost';
 const PORT = process.env.DB_PORT || '27017';
 const DATABASE = process.env.DB_DATABASE || 'files_manager';
-
-const url = `mongodb://${HOST}:${PORT}`;
+const URL = `mongodb://${HOST}:${PORT}`;
 
 class DBClient {
   constructor() {
-    MongoClient.connect(url, (err, client) => {
+    MongoClient.connect(URL, (err, client) => {
       if (!err) {
         this.db = client.db(DATABASE);
+      } else {
+        this.db = false;
       }
-      this.db = false;
     });
   }
 

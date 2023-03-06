@@ -23,13 +23,11 @@ class RedisClient {
   }
 
   async set(key, value, duration) {
-    const clientSetex = promisify(this.client.setex).bind(this.client);
-    await clientSetex(key, duration, value);
+    this.client.setex(key, duration, value);
   }
 
   async del(key) {
-    const clientDel = promisify(this.client.del).bind(this.client);
-    await clientDel(key);
+    this.client.del(key);
   }
 }
 
