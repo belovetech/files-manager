@@ -7,7 +7,7 @@ class AppController {
       redis: dbClient.isAlive(),
       db: redisClient.isAlive(),
     };
-    res.status(200).send(dbStatus);
+    return res.status(200).send(dbStatus);
   }
 
   static getStats(req, res) {
@@ -15,7 +15,7 @@ class AppController {
       users: dbClient.nbUsers(),
       files: dbClient.nbFiles(),
     };
-    return res.status(200).json(stats);
+    return res.status(200).send(stats);
   }
 }
 
