@@ -12,10 +12,10 @@ router.route('/stats').get(AppController.getStats);
 
 // users routes
 router.route('/users').post(UsersController.postNew);
-// router.route('/me').get(UsersController.getMe);
+router.route('/users/me').get(UsersController.getMe);
 
 // Auth
 router.route('/connect').get(AuthController.getConnect);
-// router.route('/disconnect').get(AuthController.getDisconnect);
+router.route('/disconnect').get(AuthController.getDisconnect);
 
 export default router;
