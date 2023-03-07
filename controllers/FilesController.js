@@ -66,7 +66,9 @@ class FilesController {
       if (file.type !== 'folder') {
         return res.status(400).json({ error: 'Parent is not a folder' });
       }
+    }
 
+    if (type === 'folder') {
       const newFile = {
         userId: user._id,
         name,
@@ -109,7 +111,6 @@ class FilesController {
     await files.insertOne(newFile);
 
     const newFileObj = { ...newFile };
-
     delete newFileObj._id;
     delete newFileObj.localPath;
 
