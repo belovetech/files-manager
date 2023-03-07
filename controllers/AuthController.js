@@ -2,6 +2,7 @@ import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import hashPassword from '../utils/hashPassword';
 import generateToken from '../utils/generateToken';
+import extractToken from '../utils/extractToken';
 
 class AuthController {
   static async getConnect(req, res) {
@@ -31,8 +32,7 @@ class AuthController {
   }
 
   static async getDisconnect(req, res) {
-    const token = req.headers['x-token'];
-
+    const token = extractToken(req);
     const key = `auth_${token}`;
 
     const userId = await redisClient.get(key);
