@@ -24,10 +24,12 @@ class UsersController {
       password: hashPassword(password),
     };
 
-    const result = await dbClient.db.collection('users').insertOne(newUser);
-    const id = result.insertedId.toString();
+    await dbClient.db.collection('users').insertOne(newUser);
 
-    return res.status(200).json({ id, email });
+    return res.status(200).json({
+      id: newUser._id,
+      email,
+    });
   }
 }
 
