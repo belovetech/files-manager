@@ -1,10 +1,13 @@
 import fs from 'fs';
+import Queue from 'bull';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 import extractToken from '../utils/extractToken';
 import generateToken from '../utils/generateToken';
 
 const { ObjectId } = require('mongodb');
+
+const imageQueue = new Queue('image queue', 'redis://127.0.0.1:6379');
 
 class FilesController {
   static async getUser(req) {
@@ -93,11 +96,11 @@ class FilesController {
     if (!fs.existsSync(filePath)) {
       fs.mkdir(filePath, (err) => {
         if (err) console.log(err);
-        fs.writeFile(filename, encodedData, 'utf-8', (err) => {
-          if (err) console.log(err);
-        });
       });
     }
+    fs.writeFile(filename, encodedData, 'utf-8', (err) => {
+      if (err) console.log(err);
+    });
 
     const newFile = {
       userId: user._id,
@@ -114,10 +117,19 @@ class FilesController {
     delete newFileObj._id;
     delete newFileObj.localPath;
 
-    return res.status(201).json({
+    res.status(201).json({
       id: newFile._id,
       ...newFileObj,
     });
+
+    if (type === 'image') {
+      await imageQueue.add({
+        fileId: newFile._id,
+        userId: newFile.userId,
+      });
+    }
+
+    return null;
   }
 }
 
