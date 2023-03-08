@@ -126,7 +126,7 @@ class FilesController {
       await imageQueue.add({
         fileId: newFile._id,
         userId: newFile.userId,
-      }); 
+      });
     }
 
     return null;
@@ -134,27 +134,72 @@ class FilesController {
 
   static async getShow(req, res) {
     const fileId = req.params.id;
-    const user = FilesController.getUser(req);
+    const user = await FilesController.getUser(req);
 
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const file = await dbClient.db.collection('files').findOne({ _id: fileId });
+    const file = await dbClient.db
+      .collection('files')
+      .findOne({ _id: new ObjectId(fileId) });
+
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
+    delete file.localPath;
     return res.status(200).json(file);
   }
 
   static async getIndex(req, res) {
-    const user = FilesController.getUser(req);
+    const user = await FilesController.getUser(req);
 
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { parentId, page } = req.query;
 
-    const parent = await dbClient.db.collection('file').findOne({parentId: {$ne: 0}});
+    const { parentId, page } = req.query;
+    const files = dbClient.db.collection('files');
+
+    let query;
+    if (!parentId) {
+      query = { userId: new ObjectId(user._id) };
+    } else {
+      query = {
+        userId: new ObjectId(user._id),
+        parentId: new ObjectId(parentId),
+      };
+    }
+
+    const pageSize = 20;
+    const pageNumber = page || 1;
+    const skip = (pageNumber - 1) * pageSize;
+
+    const aggregateResult = await files
+      .aggregate([
+        {
+          $match: query,
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: pageSize,
+        },
+      ])
+      .toArray();
+
+    const data = aggregateResult.map((file) => {
+      const newFile = {
+        ...file,
+        id: file._id,
+      };
+
+      delete newFile.localPath;
+      delete newFile._id;
+      return newFile;
+    });
+
+    return res.status(200).json(data);
   }
 }
 
