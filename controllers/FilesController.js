@@ -146,8 +146,16 @@ class FilesController {
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
-    delete file.localPath;
-    return res.status(200).json(file);
+
+    const fileCopy = { ...file };
+
+    delete fileCopy.localPath;
+    delete fileCopy._id;
+
+    return res.status(200).json({
+      id: file._id,
+      ...fileCopy,
+    });
   }
 
   static async getIndex(req, res) {
@@ -190,8 +198,8 @@ class FilesController {
 
     const data = aggregateResult.map((file) => {
       const newFile = {
-        ...file,
         id: file._id,
+        ...file,
       };
 
       delete newFile.localPath;
