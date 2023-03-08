@@ -126,10 +126,35 @@ class FilesController {
       await imageQueue.add({
         fileId: newFile._id,
         userId: newFile.userId,
-      });
+      }); 
     }
 
     return null;
+  }
+
+  static async getShow(req, res) {
+    const fileId = req.params.id;
+    const user = FilesController.getUser(req);
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const file = await dbClient.db.collection('files').findOne({ _id: fileId });
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    return res.status(200).json(file);
+  }
+
+  static async getIndex(req, res) {
+    const user = FilesController.getUser(req);
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { parentId, page } = req.query;
+
+    const parent = await dbClient.db.collection('file').findOne({parentId: {$ne: 0}});
   }
 }
 
