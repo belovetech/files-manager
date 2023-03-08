@@ -8,22 +8,23 @@ const express = require('express');
 // Define custom router
 const router = express.Router();
 
-router.route('/status').get(AppController.getStatus);
-router.route('/stats').get(AppController.getStats);
+router.get('/status', AppController.getStatus);
+router.get('/stats', AppController.getStats);
 
 // users routes
-router.route('/users').post(UsersController.postNew);
-router.route('/users/me').get(UsersController.getMe);
+router.post('/users', UsersController.postNew);
+router.get('/users/me', UsersController.getMe);
 
 // Auth
-router.route('/connect').get(AuthController.getConnect);
-router.route('/disconnect').get(AuthController.getDisconnect);
+router.get('/connect', AuthController.getConnect);
+router.get('/disconnect', AuthController.getDisconnect);
 
 // Files
-router.route('/files').post(FilesController.postUpload);
-router.route('/files').get(FilesController.getIndex);
-router.route('/files/:id').get(FilesController.getShow);
-router.route('/files/:id/publish').put(FilesController.putPublish);
-router.route('/files/:id/unpublish').put(FilesController.putUnpublish);
+router.post('/files', FilesController.postUpload);
+router.get('/files', FilesController.getIndex);
+router.get('/files/:id', FilesController.getShow);
+router.put('/files/:id/publish', FilesController.putPublish);
+router.put('/files/:id/unpublish', FilesController.putUnpublish);
+router.get('/files/:id/data', FilesController.getData);
 
 export default router;
