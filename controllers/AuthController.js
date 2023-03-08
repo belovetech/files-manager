@@ -12,7 +12,7 @@ class AuthController {
     }
 
     const encoded = authHeader.split(' ')[1];
-    const decoded = Buffer.from(encoded, 'base64').toString();
+    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
     const [email, password] = decoded.split(':');
 
     const user = await dbClient.db
@@ -43,7 +43,7 @@ class AuthController {
 
     await redisClient.del(key);
 
-    return res.status(204).json('');
+    return res.status(204).json();
   }
 }
 
