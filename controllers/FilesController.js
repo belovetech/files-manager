@@ -241,7 +241,7 @@ class FilesController {
       {
         _id: new ObjectId(fileId),
       },
-      { $set: { isPublic: option } }
+      { $set: { isPublic: option } },
     );
 
     const updatedFile = await files.findOne({
