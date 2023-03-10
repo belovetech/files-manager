@@ -241,7 +241,7 @@ class FilesController {
       {
         _id: new ObjectId(fileId),
       },
-      { $set: { isPublic: option } },
+      { $set: { isPublic: option } }
     );
 
     const updatedFile = await files.findOne({
@@ -255,6 +255,27 @@ class FilesController {
       id: new ObjectId(fileId),
       ...updatedFile,
     });
+  }
+
+  static async getFile(req, res) {
+    const fileId = req.params.id;
+    const userId = FilesController.getUser(req);
+
+    const file = await dbClient.db.collection('files').findOne({ _id: fileId });
+
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    if (file.type === 'folder' || file.type === 'file') {
+      if (!file.isPublic && (!userId || file.userId !== userId)) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+    }
+    if (file.type === 'folder') {
+      return res.status(400).json({ errro: "A folder doesn't have content" });
+    }
+    return null;
   }
 }
 
